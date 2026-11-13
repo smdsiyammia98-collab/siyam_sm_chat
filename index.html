@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIYAM SM CHAT - Login</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eaf3ff, #d5e7ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 390px;
+      background: white;
+      border-radius: 25px;
+      padding: 35px 25px;
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(0, 50, 120, 0.12);
+    }
+
+    .logo {
+      width: 85px;
+      height: 85px;
+      margin: 0 auto 22px;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #1680ff, #06459d);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #124b91;
+      font-size: 25px;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      color: #78889e;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #d7e2f0;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-bottom: 18px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #1680ff;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #1769e0;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      background: #06459d;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .back {
+      background: transparent;
+      color: #1769e0;
+      margin-top: 15px;
+    }
+
+    .footer {
+      color: #9aa8ba;
+      font-size: 12px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <section id="loginScreen">
+      <div class="logo">SM</div>
+
+      <h1>SIYAM SM CHAT</h1>
+
+      <p class="subtitle">
+        Welcome to SIYAM SM CHAT<br>
+        আপনার ফোন নম্বর দিয়ে লগইন করুন
+      </p>
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="+880 1XXXXXXXXX"
+      >
+
+      <button onclick="sendOTP()">
+        Send OTP
+      </button>
+
+      <p class="footer">
+        Secure Login • SIYAM SM CHAT
+      </p>
+    </section>
+
+    <section id="otpScreen" class="hidden">
+      <div class="logo">SM</div>
+
+      <h1>Verify Your Number</h1>
+
+      <p class="subtitle">
+        আপনার OTP কোড লিখুন
+      </p>
+
+      <input
+        type="text"
+        id="otp"
+        maxlength="6"
+        inputmode="numeric"
+        placeholder="Enter OTP"
+      >
+
+      <button onclick="verifyOTP()">
+        Verify OTP
+      </button>
+
+      <button class="back" onclick="goBack()">
+        Back to Login
+      </button>
+    </section>
+
+    <section id="successScreen" class="hidden">
+      <div class="logo">SM</div>
+      <h1>Welcome!</h1>
+      <p class="subtitle">
+        SIYAM SM CHAT-এ স্বাগতম।
+      </p>
+    </section>
+
+  </div>
+
+  <script>
+    function sendOTP() {
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!/^\+?[0-9\s-]{10,16}$/.test(phone)) {
+        alert("সঠিক ফোন নম্বর লিখুন");
+        return;
+      }
+
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("otpScreen").classList.remove("hidden");
+    }
+
+    function verifyOTP() {
+      const otp = document.getElementById("otp").value.trim();
+
+      if (!/^[0-9]{6}$/.test(otp)) {
+        alert("৬ সংখ্যার OTP লিখুন");
+        return;
+      }
+
+      alert("এটি শুধু ডিজাইন পরীক্ষা। আসল OTP যাচাই Firebase যুক্ত করার পর হবে।");
+    }
+
+    function goBack() {
+      document.getElementById("otpScreen").classList.add("hidden");
+      document.getElementById("loginScreen").classList.remove("hidden");
+    }
+  </script>
+
+</body>
+</html>
