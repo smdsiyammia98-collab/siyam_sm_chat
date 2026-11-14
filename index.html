@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIYAM SM CHAT - Login</title>
+  <title>SIYAM SM CHAT</title>
 
   <style>
     * {
@@ -85,10 +85,6 @@
       border: 1px solid #d7e2f0;
     }
 
-    .google-btn:active {
-      background: #f3f7fc;
-    }
-
     .google-icon {
       font-size: 22px;
       font-weight: bold;
@@ -98,6 +94,7 @@
     .logout-btn {
       background: #1769e0;
       color: white;
+      margin-top: 20px;
     }
 
     .footer {
@@ -125,10 +122,29 @@
       display: none;
     }
 
+    .profile-photo {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #1769e0;
+      margin: 0 auto 18px;
+      display: block;
+      background: #eaf3ff;
+    }
+
+    .user-name {
+      color: #124b91;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
     .user-email {
       color: #1769e0;
       font-size: 14px;
-      margin: 15px 0 22px;
+      margin: 12px 0;
       overflow-wrap: anywhere;
     }
   </style>
@@ -138,9 +154,7 @@
 
 <div class="container">
 
-  <!-- LOGIN SCREEN -->
   <section id="loginScreen">
-
     <div class="logo">SM</div>
 
     <h1>SIYAM SM CHAT</h1>
@@ -150,11 +164,8 @@
       আপনার Google অ্যাকাউন্ট দিয়ে লগইন করুন
     </p>
 
-    <button
-      class="google-btn"
-      id="googleBtn"
-      onclick="googleLogin()"
-    >
+    <button class="google-btn" id="googleBtn"
+      onclick="googleLogin()">
       <span class="google-icon">G</span>
       Continue with Google
     </button>
@@ -162,27 +173,28 @@
     <p class="footer">
       Secure Login • SIYAM SM CHAT
     </p>
-
   </section>
 
-  <!-- SUCCESS SCREEN -->
   <section id="successScreen" class="hidden">
 
-    <div class="logo">SM</div>
+    <img
+      id="profilePhoto"
+      class="profile-photo"
+      alt="Profile photo"
+    >
 
     <h1>Welcome!</h1>
 
-    <p class="subtitle">
-      SIYAM SM CHAT-এ স্বাগতম।
-      আপনার Google অ্যাকাউন্ট সফলভাবে যুক্ত হয়েছে।
-    </p>
+    <p id="userName" class="user-name"></p>
 
     <p id="userEmail" class="user-email"></p>
 
-    <button
-      class="logout-btn"
-      onclick="logout()"
-    >
+    <p class="subtitle">
+      SIYAM SM CHAT-এ আপনাকে স্বাগতম।
+      আপনার অ্যাকাউন্ট সফলভাবে লগইন হয়েছে।
+    </p>
+
+    <button class="logout-btn" onclick="logout()">
       Sign Out
     </button>
 
@@ -192,8 +204,8 @@
 
 </div>
 
-
 <script type="module">
+
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
@@ -205,6 +217,7 @@ import {
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIpeeJm_vHkWjrvUAd91dGfd1VgcIE7Gw",
@@ -220,9 +233,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const provider = new GoogleAuthProvider();
+
 provider.setCustomParameters({
   prompt: "select_account"
 });
+
 
 function showMessage(text, type = "") {
   const message = document.getElementById("message");
@@ -230,27 +245,51 @@ function showMessage(text, type = "") {
   message.className = type;
 }
 
+
 function showLogin() {
-  document.getElementById("loginScreen").classList.remove("hidden");
-  document.getElementById("successScreen").classList.add("hidden");
+  document.getElementById("loginScreen")
+    .classList.remove("hidden");
+
+  document.getElementById("successScreen")
+    .classList.add("hidden");
 }
 
+
 function showSuccess(user) {
-  document.getElementById("loginScreen").classList.add("hidden");
-  document.getElementById("successScreen").classList.remove("hidden");
+
+  document.getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document.getElementById("successScreen")
+    .classList.remove("hidden");
+
+  document.getElementById("userName").textContent =
+    user.displayName || "Google User";
 
   document.getElementById("userEmail").textContent =
     user.email || "Google account connected";
 
+  const photo = document.getElementById("profilePhoto");
+
+  if (user.photoURL) {
+    photo.src = user.photoURL;
+    photo.style.display = "block";
+  } else {
+    photo.style.display = "none";
+  }
+
   showMessage("সফলভাবে লগইন হয়েছে!", "success");
 }
 
+
 window.googleLogin = async function() {
+
   const button = document.getElementById("googleBtn");
 
   try {
     button.disabled = true;
     button.textContent = "Please wait...";
+
     showMessage("Google Login হচ্ছে...");
 
     const result = await signInWithPopup(auth, provider);
@@ -258,10 +297,11 @@ window.googleLogin = async function() {
     showSuccess(result.user);
 
   } catch (error) {
+
     console.error("Google Login Error:", error);
 
     showMessage(
-      "লগইন সমস্যা: " + error.code + " — " + error.message,
+      "লগইন সমস্যা: " + error.code,
       "error"
     );
 
@@ -271,25 +311,43 @@ window.googleLogin = async function() {
   }
 };
 
+
 onAuthStateChanged(auth, (user) => {
+
   if (user) {
     showSuccess(user);
   } else {
     showLogin();
   }
+
 });
 
+
 window.logout = async function() {
+
   try {
+
     await signOut(auth);
     showLogin();
+
+    const button = document.getElementById("googleBtn");
+    button.disabled = false;
+    button.innerHTML =
+      '<span class="google-icon">G</span> Continue with Google';
+
     showMessage("আপনি লগআউট করেছেন।", "success");
+
   } catch (error) {
-    showMessage("লগআউট সমস্যা: " + error.message, "error");
+
+    showMessage(
+      "লগআউট সমস্যা: " + error.message,
+      "error"
+    );
+
   }
 };
-</script>
 
+</script>
 
 </body>
 </html>
