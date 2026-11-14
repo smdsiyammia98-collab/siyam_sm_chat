@@ -192,8 +192,8 @@
 
 </div>
 
-<script type="module">
 
+<script type="module">
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
@@ -201,13 +201,10 @@ import {
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-
-// FIREBASE CONFIGURATION
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIpeeJm_vHkWjrvUAd91dGfd1VgcIE7Gw",
@@ -219,20 +216,13 @@ const firebaseConfig = {
   measurementId: "G-NYW7DQ9DCM"
 };
 
-// INITIALIZE FIREBASE
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// GOOGLE PROVIDER
-
 const provider = new GoogleAuthProvider();
-
 provider.setCustomParameters({
   prompt: "select_account"
 });
-
-// MESSAGE FUNCTION
 
 function showMessage(text, type = "") {
   const message = document.getElementById("message");
@@ -240,55 +230,38 @@ function showMessage(text, type = "") {
   message.className = type;
 }
 
-// SHOW LOGIN
-
 function showLogin() {
-  document.getElementById("loginScreen")
-    .classList.remove("hidden");
-
-  document.getElementById("successScreen")
-    .classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("successScreen").classList.add("hidden");
 }
 
-// SHOW SUCCESS
-
 function showSuccess(user) {
-  document.getElementById("loginScreen")
-    .classList.add("hidden");
-
-  document.getElementById("successScreen")
-    .classList.remove("hidden");
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("successScreen").classList.remove("hidden");
 
   document.getElementById("userEmail").textContent =
     user.email || "Google account connected";
 
-  showMessage(
-    "সফলভাবে লগইন হয়েছে!",
-    "success"
-  );
+  showMessage("সফলভাবে লগইন হয়েছে!", "success");
 }
 
-// GOOGLE LOGIN
-
 window.googleLogin = async function() {
-
   const button = document.getElementById("googleBtn");
 
   try {
-
-    showMessage("");
-
     button.disabled = true;
     button.textContent = "Please wait...";
+    showMessage("Google Login হচ্ছে...");
 
-    await signInWithRedirect(auth, provider);
+    const result = await signInWithPopup(auth, provider);
 
-  } catch(error) {
+    showSuccess(result.user);
 
-    console.error(error);
+  } catch (error) {
+    console.error("Google Login Error:", error);
 
     showMessage(
-      "লগইন করা যায়নি: " + error.message,
+      "লগইন সমস্যা: " + error.code + " — " + error.message,
       "error"
     );
 
@@ -296,78 +269,27 @@ window.googleLogin = async function() {
     button.innerHTML =
       '<span class="google-icon">G</span> Continue with Google';
   }
-
 };
 
-// REDIRECT RESULT
-
-try {
-
-  await getRedirectResult(auth);
-
-} catch(error) {
-
-  console.error(error);
-
-  let errorText = error.message;
-
-  if (error.code === "auth/unauthorized-domain") {
-    errorText =
-      "এই ওয়েবসাইটের ডোমেইন Firebase-এ অনুমোদিত নয়।";
-  } else if (error.code === "auth/operation-not-allowed") {
-    errorText =
-      "Firebase Console-এ Google Sign-In চালু করুন।";
-  } else if (error.code === "auth/network-request-failed") {
-    errorText =
-      "ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।";
-  }
-
-  showLogin();
-  showMessage(errorText, "error");
-
-}
-
-// AUTH STATE
-
 onAuthStateChanged(auth, (user) => {
-
   if (user) {
     showSuccess(user);
   } else {
     showLogin();
   }
-
 });
 
-// LOGOUT
-
 window.logout = async function() {
-
   try {
-
     await signOut(auth);
-
     showLogin();
-
-    showMessage(
-      "আপনি লগআউট করেছেন।",
-      "success"
-    );
-
-  } catch(error) {
-
-    console.error(error);
-
-    showMessage(
-      "লগআউট করা যায়নি: " + error.message,
-      "error"
-    );
-
+    showMessage("আপনি লগআউট করেছেন।", "success");
+  } catch (error) {
+    showMessage("লগআউট সমস্যা: " + error.message, "error");
   }
-
 };
-
 </script>
+
 
 </body>
 </html>
